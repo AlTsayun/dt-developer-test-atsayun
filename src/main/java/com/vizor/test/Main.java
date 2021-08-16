@@ -5,16 +5,19 @@ import com.vizor.test.gui.components.pageIndicator.impl.PageIndicatorBar;
 import com.vizor.test.gui.components.pagedContent.impl.PagedGrid;
 import com.vizor.test.gui.components.pagedPanel.PagedPanel;
 import com.vizor.test.gui.components.toolBar.ToolBar;
-import com.vizor.test.maximizableImagePanel.MaximizableImagePanel;
+import com.vizor.test.gui.components.maximizableImagePanel.MaximizableImagePanel;
 import com.vizor.test.utils.ComponentProviderWrapper.ComponentProviderWrapper;
 import com.vizor.test.utils.fileSource.impl.FolderWatcherFileSource;
 import com.vizor.test.utils.ComponentProviderWrapper.impl.ComponentProviderWrapperImpl;
 import com.vizor.test.utils.filesProvider.impl.FilesProviderImpl;
 import com.vizor.test.utils.directoryWatcher.impl.DirectoryWatcherImpl;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,11 +26,14 @@ import java.util.ArrayList;
 import java.util.function.Predicate;
 
 public class Main {
+
+    private static final Logger log = LoggerFactory.getLogger(ToolBar.class);
+
     private static final int WINDOW_WIDTH = 1024;
     private static final int WINDOW_HEIGHT = 768;
     private static final int TILE_WIDTH = 256;
     private static final int TILE_HEIGHT = 256;
-    private static final String FOLDER_PATH = "./assets";
+    private static final String DIRECTORY_PATH = "./assets";
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Main()::run);
@@ -38,7 +44,7 @@ public class Main {
     }
 
     private static void uploadFile(File file) throws IOException {
-        File dest = new File(FOLDER_PATH + "/" + file.getName());
+        File dest = new File(DIRECTORY_PATH + "/" + file.getName());
         FileUtils.copyFile(file, dest);
     }
 
@@ -61,7 +67,12 @@ public class Main {
             JComponent borderPanel = getMainPanel(componentProviderWrapper);
             frame.add(borderPanel);
         } catch (IOException e) {
-            //todo: handle cannot watch folder
+            log.info("cannot watch directory" + DIRECTORY_PATH);
+            JOptionPane.showMessageDialog(frame,
+                    "Looks like something is blocking the folder from being read. Try reopen the app and make sure nothing holds \"" + DIRECTORY_PATH + "\" folder.",
+                    "Oops...",
+                    JOptionPane.ERROR_MESSAGE);
+            frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
         }
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
@@ -81,15 +92,8 @@ public class Main {
 
     private ComponentProviderWrapperImpl getFilesComponentProvider() throws IOException {
         ComponentProviderWrapperImpl filesComponentProvider = new ComponentProviderWrapperImpl(
-                new FilesProviderImpl(new FolderWatcherFileSource(Paths.get(FOLDER_PATH), new DirectoryWatcherImpl())),
-                (f) -> {
-                    try {
-                        return new MaximizableImagePanel(f.getCanonicalPath(), TILE_WIDTH, TILE_HEIGHT);
-                    } catch (IOException e) {
-                        // todo: handle IOException while reading image file
-                        throw new RuntimeException();
-                    }
-                });
+                new FilesProviderImpl(new FolderWatcherFileSource(Paths.get(DIRECTORY_PATH), new DirectoryWatcherImpl())),
+                (f) -> new MaximizableImagePanel(f.getPath(), TILE_WIDTH, TILE_HEIGHT));
         filesComponentProvider.setPredicate(getImageFilePredicate());
         return filesComponentProvider;
     }

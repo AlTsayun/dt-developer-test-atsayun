@@ -1,4 +1,4 @@
-package com.vizor.test.maximizableImagePanel;
+package com.vizor.test.gui.components.maximizableImagePanel;
 
 import com.vizor.test.gui.components.imagePanel.ImagePanel;
 import org.slf4j.Logger;

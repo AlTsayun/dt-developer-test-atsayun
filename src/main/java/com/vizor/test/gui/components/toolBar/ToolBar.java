@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -60,7 +61,11 @@ public class ToolBar extends JPanel {
                     try {
                         uploadTool.upload(source);
                     } catch (IOException e) {
-                        //todo: handle ioException while uploading file
+                        log.info("cannot copy file " + source.getName());
+                        JOptionPane.showMessageDialog(this,
+                                "Cannot copy file " + source.getName(),
+                                "Oops...",
+                                JOptionPane.ERROR_MESSAGE);
                     }
                 });
                 thread.start();
