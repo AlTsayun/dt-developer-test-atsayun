@@ -61,6 +61,8 @@ public class PagedGrid implements PagedContent {
              i < getStartIndexForPage(currentPageNumber + 1) && i < tiles.size(); i++) {
             component.add(tiles.get(i));
         }
+        component.revalidate();
+        component.repaint();
     }
 
     private int getStartIndexForPage(int i) {

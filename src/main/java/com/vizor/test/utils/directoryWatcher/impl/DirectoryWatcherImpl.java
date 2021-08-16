@@ -65,7 +65,6 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
 
         WatchEvent<Path> ev = (WatchEvent<Path>) event;
         Path filename = Paths.get(dir.toString(), ev.context().toString());
-
         if (kind == ENTRY_CREATE) {
             log.info("FolderWatcherImpl created" + filename);
             listener.created(filename.toFile());
