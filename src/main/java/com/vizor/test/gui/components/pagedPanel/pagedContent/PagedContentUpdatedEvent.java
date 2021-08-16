@@ -1,8 +1,8 @@
 package com.vizor.test.gui.components.pagedPanel.pagedContent;
 
 public class PagedContentUpdatedEvent {
-    private int totalPagesCount;
-    private int currentPageNumber;
+    private final int totalPagesCount;
+    private final int currentPageNumber;
 
     public PagedContentUpdatedEvent(int totalPagesCount, int currentPageNumber) {
         this.totalPagesCount = totalPagesCount;

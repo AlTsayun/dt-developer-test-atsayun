@@ -10,16 +10,24 @@ import java.util.function.Consumer;
 
 public class ImagePanel extends JPanel {
 
-    private final BufferedImage image;
+    protected final BufferedImage image;
 
-    private final Consumer<Graphics> drawAction;
+    protected final String filename;
+
+    protected final Consumer<Graphics> drawAction;
 
     public ImagePanel(String pathname) {
+        filename = pathname;
         image = readImageFile(pathname);
-        drawAction = (g) -> g.drawImage(image, 0, 0, this);
+        drawAction = (g) -> g.drawImage(
+                image,
+                (this.getWidth() - image.getWidth()) / 2,
+                (this.getHeight() - image.getHeight()) / 2,
+                this);
     }
 
     public ImagePanel(String pathname, int width, int height) {
+        filename = pathname;
         image = readImageFile(pathname);
         drawAction = (g) -> g.drawImage(
                 image,
@@ -30,7 +38,7 @@ public class ImagePanel extends JPanel {
                 this);
     }
 
-    private BufferedImage readImageFile(String pathname) {
+    protected BufferedImage readImageFile(String pathname) {
         try {
             return ImageIO.read(new File(pathname));
         } catch (IOException ex) {
@@ -43,5 +51,6 @@ public class ImagePanel extends JPanel {
         super.paintComponent(g);
         drawAction.accept(g);
     }
+
 
 }

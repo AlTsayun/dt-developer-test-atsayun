@@ -12,6 +12,7 @@ import java.util.List;
 
 public class PagedGrid implements PagedContent {
 
+    private ComponentProvider componentProvider;
     private List<JComponent> tiles;
 
     private JComponent component;
@@ -27,8 +28,10 @@ public class PagedGrid implements PagedContent {
 
     private PagedContentUpdatedAction contentUpdated;
 
-    public PagedGrid(List<JComponent> tiles, int tileWidth, int tileHeight) {
-        this.tiles = tiles;
+    public PagedGrid(ComponentProvider componentProvider, int tileWidth, int tileHeight) {
+        this.componentProvider = componentProvider;
+        componentProvider.setOnUpdated((e) -> tiles = e.getComponents());
+        this.tiles = componentProvider.getComponents();
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
         this.rowsCount = 1;
@@ -63,21 +66,24 @@ public class PagedGrid implements PagedContent {
 
     private void drawTilesForCurrentPage() {
         component.removeAll();
+        component.revalidate();
+        component.repaint();
         component.setLayout(new GridLayout(0, colsCount));
         for (int i = (currentPageNumber - 1) * colsCount * rowsCount; i < currentPageNumber * colsCount * rowsCount && i < tiles.size(); i++) {
             component.add(tiles.get(i));
         }
     }
 
-    private void recalculateGrid(){
+    private void recalculateGrid() {
         colsCount = component.getWidth() / tileWidth;
         rowsCount = component.getHeight() / tileHeight;
         currentPageNumber = 1;
         totalPagesCount = (int) Math.ceil(tiles.size() / (double) (colsCount * rowsCount));
     }
 
-    public void setTiles(List<JComponent> tiles) {
-        this.tiles = tiles;
+    public void setComponentProvider(ComponentProvider componentProvider) {
+        this.componentProvider = componentProvider;
+        componentProvider.setOnUpdated((e) -> tiles = e.getComponents());
         recalculateGrid();
     }
 
