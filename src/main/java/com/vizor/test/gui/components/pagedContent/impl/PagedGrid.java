@@ -42,19 +42,13 @@ public class PagedGrid implements PagedContent {
             }
 
             @Override
-            public void componentMoved(ComponentEvent e) {
-
-            }
+            public void componentMoved(ComponentEvent e) { }
 
             @Override
-            public void componentShown(ComponentEvent e) {
-
-            }
+            public void componentShown(ComponentEvent e) { }
 
             @Override
-            public void componentHidden(ComponentEvent e) {
-
-            }
+            public void componentHidden(ComponentEvent e) { }
         });
     }
 
@@ -63,9 +57,14 @@ public class PagedGrid implements PagedContent {
         component.revalidate();
         component.repaint();
         component.setLayout(new GridLayout(0, Math.max(colsCount, 1)));
-        for (int i = (currentPageNumber - 1) * colsCount * rowsCount; i < currentPageNumber * colsCount * rowsCount && i < tiles.size(); i++) {
+        for (int i = getStartIndexForPage(currentPageNumber);
+             i < getStartIndexForPage(currentPageNumber + 1) && i < tiles.size(); i++) {
             component.add(tiles.get(i));
         }
+    }
+
+    private int getStartIndexForPage(int i) {
+        return (i - 1) * colsCount * rowsCount;
     }
 
     private void recalculateGrid() {

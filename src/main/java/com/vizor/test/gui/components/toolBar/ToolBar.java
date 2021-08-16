@@ -28,19 +28,18 @@ public class ToolBar extends JPanel {
         this.uploadTool = uploadTool;
         this.searchTool = searchTool;
 
-        this.setBorder(BorderFactory.createLineBorder(Color.RED));
-
         this.tfSearch = new JTextField();
         tfSearch.setMaximumSize(new Dimension(256, 0));
+
         this.btnSearch = new JButton("Search");
+        btnSearch.addActionListener(onSearchClicked());
+
         this.btnUpload = new JButton("Upload image");
+        btnUpload.addActionListener(onUploadClicked());
 
         this.fc = new JFileChooser();
         fc.addChoosableFileFilter(getImageFileFilter());
         fc.setAcceptAllFileFilterUsed(false);
-        btnUpload.addActionListener(onUploadClicked());
-
-        btnSearch.addActionListener(onSearchClicked());
 
         this.setLayout(setupLayout());
     }

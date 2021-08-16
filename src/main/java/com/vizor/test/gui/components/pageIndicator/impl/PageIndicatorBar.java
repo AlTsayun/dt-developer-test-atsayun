@@ -13,7 +13,7 @@ public class PageIndicatorBar implements PageIndicator {
     private final JButton btnPrevious;
     private final JButton btnNext;
     private final JLabel lblPageNumber;
-    private JComponent component;
+    private final JComponent component;
 
     private int currentPageNumber;
     private int totalPagesCount;
@@ -22,9 +22,9 @@ public class PageIndicatorBar implements PageIndicator {
 
     public PageIndicatorBar() {
         this.component = new BorderPanel();
-        btnPrevious = new JButton("<");
-        btnNext = new JButton(">");
-        lblPageNumber = new JLabel("/");
+        this.btnPrevious = new JButton("<");
+        this.btnNext = new JButton(">");
+        this.lblPageNumber = new JLabel("/");
         lblPageNumber.setHorizontalAlignment(JLabel.CENTER);
         lblPageNumber.setVerticalAlignment(JLabel.CENTER);
 
