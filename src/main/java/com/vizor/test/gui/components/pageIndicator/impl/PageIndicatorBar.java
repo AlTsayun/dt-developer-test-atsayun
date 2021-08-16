@@ -1,9 +1,9 @@
-package com.vizor.test.gui.components.pagedPanel.pageIndicator.impl;
+package com.vizor.test.gui.components.pageIndicator.impl;
 
 import com.vizor.test.gui.components.borderPanel.BorderPanel;
 import com.vizor.test.gui.components.pagedPanel.PageChangedAction;
 import com.vizor.test.gui.components.pagedPanel.PageChangedEvent;
-import com.vizor.test.gui.components.pagedPanel.pageIndicator.PageIndicator;
+import com.vizor.test.gui.components.pageIndicator.PageIndicator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,13 +28,9 @@ public class PageIndicatorBar implements PageIndicator {
         lblPageNumber.setHorizontalAlignment(JLabel.CENTER);
         lblPageNumber.setVerticalAlignment(JLabel.CENTER);
 
-        btnPrevious.addActionListener((l) -> {
-            changePageNumber(currentPageNumber - 1);
-        });
+        btnPrevious.addActionListener((l) -> changePageNumber(currentPageNumber - 1));
 
-        btnNext.addActionListener((l) -> {
-            changePageNumber(currentPageNumber + 1);
-        });
+        btnNext.addActionListener((l) -> changePageNumber(currentPageNumber + 1));
 
         component.add(btnPrevious, BorderLayout.WEST);
         component.add(btnNext, BorderLayout.EAST);

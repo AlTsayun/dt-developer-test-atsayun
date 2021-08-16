@@ -1,4 +1,4 @@
-package com.vizor.test.gui.components.pagedPanel.pageIndicator;
+package com.vizor.test.gui.components.pageIndicator;
 
 import com.vizor.test.gui.components.pagedPanel.PageChangedAction;
 

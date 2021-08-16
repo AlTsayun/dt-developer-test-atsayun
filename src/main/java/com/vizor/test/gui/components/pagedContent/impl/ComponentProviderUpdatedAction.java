@@ -1,4 +1,4 @@
-package com.vizor.test.gui.components.pagedPanel.pagedContent.impl;
+package com.vizor.test.gui.components.pagedContent.impl;
 
 @FunctionalInterface
 public interface ComponentProviderUpdatedAction {

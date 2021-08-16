@@ -3,9 +3,8 @@ package com.vizor.test.utils.fileSource.impl;
 import com.vizor.test.utils.fileSource.FileSource;
 import com.vizor.test.utils.fileSource.FileUpdatedAction;
 import com.vizor.test.utils.fileSource.FileUpdatedEvent;
-import com.vizor.test.utils.folderWatcher.FolderWatcher;
-import com.vizor.test.utils.folderWatcher.FolderWatcherListener;
-import com.vizor.test.utils.folderWatcher.impl.FolderWatcherImpl;
+import com.vizor.test.utils.directoryWatcher.DirectoryWatcher;
+import com.vizor.test.utils.directoryWatcher.DirectoryWatcherListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,13 +15,11 @@ import java.util.List;
 
 public class FolderWatcherFileSource implements FileSource {
     private Path dir;
-    private FolderWatcher folderWatcher;
     private FileUpdatedAction fileUpdatedAction;
 
-    public FolderWatcherFileSource(Path dir, FolderWatcher folderWatcher) throws IOException {
+    public FolderWatcherFileSource(Path dir, DirectoryWatcher directoryWatcher) throws IOException {
         this.dir = dir;
-        this.folderWatcher = folderWatcher;
-        folderWatcher.watchDirectory(dir, new FolderWatcherListener() {
+        directoryWatcher.watchDirectory(dir, new DirectoryWatcherListener() {
             @Override
             public void deleted(File file) {
                 if (fileUpdatedAction != null){
@@ -52,7 +49,7 @@ public class FolderWatcherFileSource implements FileSource {
         if (files == null){
             throw new IOException("cannot list files of dir " + dir);
         }
-        return Arrays.asList(files);
+        return new ArrayList<>(Arrays.asList(files));
     }
 
     @Override

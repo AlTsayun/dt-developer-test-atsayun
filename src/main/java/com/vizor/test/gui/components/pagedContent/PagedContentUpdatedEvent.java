@@ -1,4 +1,4 @@
-package com.vizor.test.gui.components.pagedPanel.pagedContent;
+package com.vizor.test.gui.components.pagedContent;
 
 public class PagedContentUpdatedEvent {
     private final int totalPagesCount;

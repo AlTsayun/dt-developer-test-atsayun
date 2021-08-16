@@ -31,15 +31,24 @@ public class MaximizableImagePanel extends ImagePanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                JFrame frame = new JFrame(Paths.get(filename).getFileName().toString());
-                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                ImagePanel maximizedImage = new ImagePanel(filename);
-                frame.getContentPane().add(maximizedImage);
-                frame.pack();
-                frame.setMinimumSize(new Dimension(MAXIMIZED_WINDOW_WIDTH, MAXIMIZED_WINDOW_HEIGHT));
-                frame.setVisible(true);
+                showMaximizedImage();
             }
         });
+    }
+
+    private void showMaximizedImage() {
+        JFrame frame = new JFrame(getWindowTitle());
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        ImagePanel maximizedImage = new ImagePanel(filename);
+        frame.getContentPane().add(maximizedImage);
+        frame.pack();
+        frame.setMinimumSize(new Dimension(MAXIMIZED_WINDOW_WIDTH, MAXIMIZED_WINDOW_HEIGHT));
+        frame.setVisible(true);
+        log.info("image maximized: " + filename);
+    }
+
+    private String getWindowTitle() {
+        return Paths.get(filename).getFileName().toString();
     }
 
 }

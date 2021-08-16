@@ -1,75 +1,96 @@
 package com.vizor.test;
 
 import com.vizor.test.gui.components.borderPanel.BorderPanel;
+import com.vizor.test.gui.components.pageIndicator.impl.PageIndicatorBar;
+import com.vizor.test.gui.components.pagedContent.impl.PagedGrid;
 import com.vizor.test.gui.components.pagedPanel.PagedPanel;
-import com.vizor.test.gui.components.pagedPanel.pageIndicator.impl.PageIndicatorBar;
-import com.vizor.test.gui.components.pagedPanel.pagedContent.impl.ComponentProvider;
-import com.vizor.test.gui.components.pagedPanel.pagedContent.impl.ComponentProviderUpdatedAction;
-import com.vizor.test.gui.components.pagedPanel.pagedContent.impl.PagedGrid;
 import com.vizor.test.gui.components.toolBar.ToolBar;
 import com.vizor.test.maximizableImagePanel.MaximizableImagePanel;
+import com.vizor.test.utils.ComponentProviderWrapper.ComponentProviderWrapper;
 import com.vizor.test.utils.fileSource.impl.FolderWatcherFileSource;
-import com.vizor.test.utils.filesProvider.FilesProvider;
-import com.vizor.test.utils.folderWatcher.impl.FolderWatcherImpl;
+import com.vizor.test.utils.ComponentProviderWrapper.impl.ComponentProviderWrapperImpl;
+import com.vizor.test.utils.filesProvider.impl.FilesProviderImpl;
+import com.vizor.test.utils.directoryWatcher.impl.DirectoryWatcherImpl;
+import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Predicate;
 
 public class Main {
-    private static final int WIDTH = 1024;
-    private static final int HEIGHT = 768;
+    private static final int WINDOW_WIDTH = 1024;
+    private static final int WINDOW_HEIGHT = 768;
+    private static final int TILE_WIDTH = 256;
+    private static final int TILE_HEIGHT = 256;
+    private static final String FOLDER_PATH = "./assets";
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Main()::run);
     }
 
+    private static Predicate<File> getSearchPredicate(String query) {
+        return (f) -> getImageFilePredicate().test(f) && f.getName().toLowerCase().contains(query.toLowerCase());
+    }
+
+    private static void uploadFile(File file) throws IOException {
+        File dest = new File(FOLDER_PATH + "/" + file.getName());
+        FileUtils.copyFile(file, dest);
+    }
+
+    private static Predicate<File> getImageFilePredicate() {
+        return f -> {
+            try {
+                return Files.probeContentType(f.toPath()).matches("image.*");
+            } catch (IOException e) {
+                return false;
+            }
+        };
+    }
+
     public void run() {
         JFrame frame = new JFrame("DT Developer Test");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setMinimumSize(new Dimension(WIDTH, HEIGHT));
+        frame.setMinimumSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
         try {
-            FilesProvider filesProvider = new FilesProvider(new FolderWatcherFileSource(Paths.get("./assets"), new FolderWatcherImpl()));
-
-            List<JComponent> tiles = new ArrayList<>();
-            filesProvider.get(f -> {
-                        try {
-                            return Files.probeContentType(f.toPath()).matches("image.*");
-                        } catch (IOException e) {
-                            return false;
-                        }
-                    })
-                    .forEach(f -> {
-                        try {
-                            tiles.add(new MaximizableImagePanel(f.getCanonicalPath(), 256, 256));
-                        } catch (IOException e) {
-                            //cannot get canonical path of a file
-                        }
-                    });
-            PagedPanel pagedPanel = new PagedPanel(new PagedGrid(new ComponentProvider() {
-                @Override
-                public List<JComponent> getComponents() {
-                    return tiles;
-                }
-
-                @Override
-                public void setOnUpdated(ComponentProviderUpdatedAction a) {
-
-                }
-            }, 256, 256), new PageIndicatorBar());
-            JComponent borderPanel = new BorderPanel();
-            borderPanel.add(pagedPanel, BorderLayout.CENTER);
-            borderPanel.add(new ToolBar(), BorderLayout.NORTH);
-
+            ComponentProviderWrapper componentProviderWrapper = getFilesComponentProvider();
+            JComponent borderPanel = getMainPanel(componentProviderWrapper);
             frame.add(borderPanel);
-            frame.setVisible(true);
-            frame.setLocationRelativeTo(null);
         } catch (IOException e) {
-            //cannot watch folder
+            //todo: handle cannot watch folder
         }
+        frame.setVisible(true);
+        frame.setLocationRelativeTo(null);
+    }
+
+    private JComponent getMainPanel(ComponentProviderWrapper componentProviderWrapper) {
+        PagedPanel pagedPanel = new PagedPanel(
+                componentProviderWrapper.getComponentProvider(),
+                new PagedGrid(new ArrayList<>(), TILE_WIDTH, TILE_HEIGHT),
+                new PageIndicatorBar());
+        JComponent borderPanel = new BorderPanel();
+        borderPanel.add(pagedPanel, BorderLayout.CENTER);
+        borderPanel.add(new ToolBar(Main::uploadFile, query -> componentProviderWrapper.setPredicate(getSearchPredicate(query))),
+                BorderLayout.NORTH);
+        return borderPanel;
+    }
+
+    private ComponentProviderWrapperImpl getFilesComponentProvider() throws IOException {
+        ComponentProviderWrapperImpl filesComponentProvider = new ComponentProviderWrapperImpl(
+                new FilesProviderImpl(new FolderWatcherFileSource(Paths.get(FOLDER_PATH), new DirectoryWatcherImpl())),
+                (f) -> {
+                    try {
+                        return new MaximizableImagePanel(f.getCanonicalPath(), TILE_WIDTH, TILE_HEIGHT);
+                    } catch (IOException e) {
+                        // todo: handle IOException while reading image file
+                        throw new RuntimeException();
+                    }
+                });
+        filesComponentProvider.setPredicate(getImageFilePredicate());
+        return filesComponentProvider;
     }
 }
